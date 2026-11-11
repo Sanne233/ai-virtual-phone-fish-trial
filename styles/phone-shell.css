@@ -1056,6 +1056,43 @@
 
 /* ── Mobile responsive ── */
 
+/* iPad/tablet keeps the phone-shaped experience, but scales it against both
+   available axes. This prevents landscape clipping while letting portrait
+   use more of the screen. The runtime value is updated from visualViewport so
+   rotation, Split View and Safari's changing toolbar height remain safe. */
+@media (min-width: 501px) and (max-width: 1366px) {
+  html[data-tablet-phone-layout="1"],
+  html[data-tablet-phone-layout="1"] body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  html[data-tablet-phone-layout="1"] .app-root,
+  html[data-tablet-phone-layout="1"] .app-root.splash-root {
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    padding:
+      max(24px, env(safe-area-inset-top, 0px))
+      max(24px, env(safe-area-inset-right, 0px))
+      max(24px, env(safe-area-inset-bottom, 0px))
+      max(24px, env(safe-area-inset-left, 0px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  html[data-tablet-phone-layout="1"] .phone-shell-wrap,
+  html[data-tablet-phone-layout="1"] .splash-shell-wrap {
+    flex: 0 0 auto;
+    margin: 0;
+    transform: scale(var(--tablet-phone-scale, 1));
+    transform-origin: center center;
+  }
+}
+
 @media (max-width: 500px) and (hover: none) and (pointer: coarse) {
 
   /* 用户在设置里显式开启「显示系统状态栏」且运行时不在全屏时，控制器才会挂
