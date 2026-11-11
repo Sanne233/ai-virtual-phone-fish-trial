@@ -121,9 +121,9 @@ function useTabletPhoneScale(): void {
       const viewport = window.visualViewport;
       const width = viewport?.width ?? window.innerWidth;
       const height = viewport?.height ?? window.innerHeight;
-      const isTablet = navigator.maxTouchPoints > 1 && width > 500 && width <= 1366;
+      const isTabletViewport = width > 500 && width <= 1366;
 
-      if (!isTablet) {
+      if (!isTabletViewport) {
         document.documentElement.style.removeProperty("--tablet-phone-scale");
         document.documentElement.removeAttribute("data-tablet-phone-layout");
         return;
