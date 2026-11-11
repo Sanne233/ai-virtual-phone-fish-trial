@@ -112,6 +112,49 @@ type WindowWithIdleCallback = Window & {
   cancelIdleCallback?: (handle: number) => void;
 };
 
+const TABLET_PHONE_OUTER_WIDTH = 410;
+const TABLET_PHONE_OUTER_HEIGHT = 864;
+
+function useTabletPhoneScale(): void {
+  useEffect(() => {
+    const syncScale = () => {
+      const viewport = window.visualViewport;
+      const width = viewport?.width ?? window.innerWidth;
+      const height = viewport?.height ?? window.innerHeight;
+      const isTablet = navigator.maxTouchPoints > 1 && width > 500 && width <= 1366;
+
+      if (!isTablet) {
+        document.documentElement.style.removeProperty("--tablet-phone-scale");
+        document.documentElement.removeAttribute("data-tablet-phone-layout");
+        return;
+      }
+
+      const gutter = 24;
+      const availableWidth = Math.max(1, width - gutter * 2);
+      const availableHeight = Math.max(1, height - gutter * 2);
+      const scale = Math.min(
+        availableWidth / TABLET_PHONE_OUTER_WIDTH,
+        availableHeight / TABLET_PHONE_OUTER_HEIGHT,
+        1.12,
+      );
+
+      document.documentElement.style.setProperty("--tablet-phone-scale", scale.toFixed(4));
+      document.documentElement.setAttribute("data-tablet-phone-layout", "1");
+    };
+
+    syncScale();
+    window.addEventListener("resize", syncScale);
+    window.visualViewport?.addEventListener("resize", syncScale);
+
+    return () => {
+      window.removeEventListener("resize", syncScale);
+      window.visualViewport?.removeEventListener("resize", syncScale);
+      document.documentElement.style.removeProperty("--tablet-phone-scale");
+      document.documentElement.removeAttribute("data-tablet-phone-layout");
+    };
+  }, []);
+}
+
 function scheduleIdleTask(callback: () => void): () => void {
   if (typeof window === "undefined") {
     return () => { };
@@ -231,6 +274,7 @@ async function prepareDesktopThemeForFirstPaint(): Promise<PreparedDesktopTheme>
 }
 
 export function MainApp({ resumeAfterIdentitySwitch = false }: { resumeAfterIdentitySwitch?: boolean } = {}) {
+  useTabletPhoneScale();
   const [preparedDesktopTheme, setPreparedDesktopTheme] = useState<PreparedDesktopTheme | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [startupError, setStartupError] = useState("");
